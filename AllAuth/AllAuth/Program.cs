@@ -14,7 +14,7 @@ public class Program
 
         var githubClientId = builder.Configuration["Github:ClientId"] ?? throw new Exception("client id not found");
         var githubClientSecret = builder.Configuration["Github:ClientSecret"] ?? throw new Exception("client secret not found");
-
+        
         builder.Services.AddCors();
         builder.Services
             .AddAuthentication("cookie")

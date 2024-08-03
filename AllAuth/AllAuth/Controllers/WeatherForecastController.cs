@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,7 @@ public class WeatherForecastController : ControllerBase
     }
 
     [HttpGet("tokens")]
-    public async Task<List<TokenResponse>> Tokens()
+    public async Task<IActionResult> Tokens([FromQuery] string redirect)
     {
         _logger.LogInformation("tokens called");
         var token = await this.HttpContext.GetTokenAsync("access_token");
@@ -31,17 +32,25 @@ public class WeatherForecastController : ControllerBase
         {
             _logger.LogInformation("tokens: {type}, {value}", tokenResponse.Type, tokenResponse.Value);
         }
-        return tokens;
+        
+        Response.Cookies.Append("asd", "gec");
+
+        return Redirect(redirect);
     }
 
     [HttpGet("login")]
-    public async Task<IResult> Login()
+    public async Task<IResult> Login([FromQuery] string redirect)
     {
         _logger.LogInformation("login called");
-        return Results.Challenge(new AuthenticationProperties()
+
+        var result = Results.Challenge(new AuthenticationProperties()
         {
-            RedirectUri = "https://localhost:7096/"
+            RedirectUri = $"/WeatherForecast/tokens?redirect={redirect}"
         }, authenticationSchemes: new List<string>() { "github" });
+
+        ;
+
+        return result;
     }
 }
 
