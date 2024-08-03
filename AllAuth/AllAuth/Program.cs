@@ -12,6 +12,9 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        var githubClientId = builder.Configuration["Github:ClientId"] ?? throw new Exception("client id not found");
+        var githubClientSecret = builder.Configuration["Github:ClientSecret"] ?? throw new Exception("client secret not found");
+
         builder.Services.AddCors();
         builder.Services
             .AddAuthentication("cookie")
@@ -19,8 +22,8 @@ public class Program
             .AddOAuth("github", config =>
             {
                 // https://github.com/settings/applications/2659856
-                config.ClientId = "Ov23lizKZov1naH8oY12";
-                config.ClientSecret = "dd7fcc3a778f66b930f1938159593e9d88fc5c75";
+                config.ClientId = githubClientId;
+                config.ClientSecret = githubClientSecret;
 
                 // random
                 config.CallbackPath = "/github/callback";
