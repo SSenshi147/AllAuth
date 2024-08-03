@@ -1,0 +1,6 @@
+@AllAuth_HostAddress = http://localhost:5278
+
+GET {{AllAuth_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
