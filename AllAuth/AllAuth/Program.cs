@@ -38,7 +38,7 @@ public class Program
 
                 // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#3-use-the-access-token-to-access-the-api
                 config.UserInformationEndpoint = "https://api.github.com/user";
-
+                
                 config.Events.OnCreatingTicket += async context =>
                 {
                     using var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);

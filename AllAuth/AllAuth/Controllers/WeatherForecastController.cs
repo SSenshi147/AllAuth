@@ -40,7 +40,7 @@ public class WeatherForecastController : ControllerBase
         _logger.LogInformation("login called");
         return Results.Challenge(new AuthenticationProperties()
         {
-            RedirectUri = "https://localhost:5005/WeatherForecast/tokens"
+            RedirectUri = "https://localhost:7096/"
         }, authenticationSchemes: new List<string>() { "github" });
     }
 }
