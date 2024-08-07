@@ -1,10 +1,23 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using AllAuth.Controllers;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace AllAuth;
+
+public static class DataHolder
+{
+    public static UserData Data { get; set; }
+}
+
+public class UserData
+{
+    public string Login { get; set; }
+    public int Id { get; set; }
+}
 
 public class Program
 {
@@ -13,8 +26,9 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         var githubClientId = builder.Configuration["Github:ClientId"] ?? throw new Exception("client id not found");
-        var githubClientSecret = builder.Configuration["Github:ClientSecret"] ?? throw new Exception("client secret not found");
-        
+        var githubClientSecret = builder.Configuration["Github:ClientSecret"] ??
+                                 throw new Exception("client secret not found");
+
         builder.Services.AddCors();
         builder.Services
             .AddAuthentication("cookie")
@@ -39,13 +53,42 @@ public class Program
                 // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#3-use-the-access-token-to-access-the-api
                 config.UserInformationEndpoint = "https://api.github.com/user";
                 
+                // 1
+                config.Events.OnRedirectToAuthorizationEndpoint += context =>
+                {
+                    ;
+                    return Task.CompletedTask;
+                };
+                
+                // 2
                 config.Events.OnCreatingTicket += async context =>
                 {
                     using var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
                     using var response = await context.Backchannel.SendAsync(request);
-                    var user = await response.Content.ReadFromJsonAsync<JsonElement>();
-                    context.RunClaimActions(user);
+                    //var user = await response.Content.ReadFromJsonAsync<JsonElement>();
+                    var githubUser = await response.Content.ReadFromJsonAsync<UserData>();
+                    DataHolder.Data = githubUser ?? throw new Exception();
+                    //context.RunClaimActions(user);
+                };
+
+                // 3
+                config.Events.OnTicketReceived += context =>
+                {
+                    ;
+                    return Task.CompletedTask;
+                };
+                
+                config.Events.OnAccessDenied += context =>
+                {
+                    ;
+                    return Task.CompletedTask;
+                };
+
+                config.Events.OnRemoteFailure += context =>
+                {
+                    ;
+                    return Task.CompletedTask;
                 };
             });
 

@@ -35,7 +35,8 @@ public class WeatherForecastController : ControllerBase
         
         Response.Cookies.Append("asd", "gec");
 
-        return Redirect(redirect);
+        var withparams = $"{redirect}?id={DataHolder.Data.Id}&name={DataHolder.Data.Login}";
+        return Redirect(withparams);
     }
 
     [HttpGet("login")]
